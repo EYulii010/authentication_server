@@ -6,7 +6,7 @@ fastify.register(fastifyJwt, {
   secret: 'SUPER_SECRET_KEY_EXPO_2026' // Cambiamos esto después
 });
 
-// 2. Decorador para proteger rutas (Middleware)
+// 2. Middleware para proteger rutas
 fastify.decorate("authenticate", async function(request, reply) {
   try {
     await request.jwtVerify();
@@ -19,11 +19,11 @@ fastify.decorate("authenticate", async function(request, reply) {
 fastify.post('/login', async (request, reply) => {
   const { username, password } = request.body;
   
-  // Aquí validarían contra su DB (MySQL/PostgreSQL)
+  // Aquí vamos a validar con la database
   if (username === 'admin' && password === 'admin123') {
     const token = fastify.jwt.sign({ 
       user: username, 
-      role: 'hr_manager' // Útil para los permisos de la Ley 787
+      role: 'hr_manager' 
     });
     return { token };
   }
@@ -36,7 +36,7 @@ fastify.get('/candidates', { onRequest: [fastify.authenticate] }, async (request
   return { message: "Lista de candidatos cargada", user: request.user };
 });
 
-// Levantar servidor
+// 5. Iniciamos el servidor
 const start = async () => {
   try {
     await fastify.listen({ port: 3000 });
